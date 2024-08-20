@@ -1,10 +1,7 @@
-# Some info about Smeshariki AW game archives
-This is just a data stream, that contains WAV, DDS and other files. No compressing, no encrypting. Simple as apple. Game uses ````Resource.toc```` for them, but SAWU won't use it.
+# ~~Some info about Smeshariki AW game archives~~
+~~This is just a data stream, that contains WAV, DDS and other files. No compressing, no encrypting. Simple as apple.
 
-# TODO
-1. Fix DDS unpack
-2. Some WAV files are broken after unpack, fix them
-3. Fix incorrect WAV size
+Current realisation of SAWU **WILL NOT BE UPDATED!**
 
 # idk
 ### What is Smeshariki Another World?
