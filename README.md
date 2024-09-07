@@ -1,5 +1,5 @@
 # Some info about Smeshariki AW game archives
-This is just a data stream, that contains WAV, DDS and other files. No compressing, no encrypting. Simple as apple.
+This is just a data stream, that contains WAV, DDS and other files. Textures are compressed, no encrypting. Simple as apple.
 
 Current realisation of SAWU **WILL NOT BE UPDATED!**
 
