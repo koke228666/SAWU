@@ -1,4 +1,6 @@
 showftypes = True
-fixcount = False #do not use with resource preview
+fixcount = False #may cause troubles
 logpath = 'SAWU.log'
-jsonpath = 'SAWU.json'
+jsonpath = 'Export\SAWU.json'
+txtpath = 'Export\SAWU.txt'
+csvpath = 'Export\SAWU.csv'

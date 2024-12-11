@@ -1,5 +1,5 @@
-import os, sys, struct, time, io, json
-import tkinter as tk
+import os, sys, struct, time, io, json, wave, pickle
+import simpleaudio as sa
 from PIL import Image, ImageTk
 
 def read_resource(offset, length, packnum, packpath):
@@ -38,14 +38,35 @@ def unpack_txt(data):
 
     return image
 
-def preview_image(image):
-    root = tk.Tk()
-    root.title("Image viewer")
+def preview_wave(f):
+    wave_file = f
+    wave_file.seek(0)
+    wave_file.write(b'\x52\x49\x46\x46')
+    wave_file.seek(0)
+    wave_file = wave.open(wave_file)
+    wave_obj = sa.WaveObject.from_wave_read(wave_file)
+    play_obj = wave_obj.play()
+    play_obj.wait_done()
 
-    image_tk = ImageTk.PhotoImage(image)
-
-    label = tk.Label(root, image=image_tk)
-    label.pack()
-
-    root.mainloop()
-
+def save_file(fdata, fpath, toc_dir, compressed):
+    if fdata['ftid'] == 1:
+        filetype = fpath+'.dds'
+    elif fdata['ftid'] == 3:
+        filetype = fpath+'.wav'
+    else:
+        fpath = fpath+'.bin'
+    if fdata['ftid'] == 1:
+        if compressed:
+            unpack_txt(read_resource(fdata['offset'], fdata['sizepkg'], fdata['archnum'], toc_dir)).save(fpath)
+        else:
+            Image.open(read_resource(fdata['offset'], fdata['sizepkg'], fdata['archnum'], toc_dir)).save(fpath)
+    elif fdata['ftid'] == 3:
+        with open(fpath, 'wb') as f:
+            wave_file = read_resource(fdata['offset'], fdata['sizepkg'], fdata['archnum'], toc_dir)
+            wave_file.seek(0)
+            wave_file.write(b'\x52\x49\x46\x46')
+            wave_file.seek(0)
+            f.write(wave_file.getbuffer().tobytes())
+    else:
+        with open(fpath, 'wb') as f:
+            f.write(read_resource(fdata['offset'], fdata['sizepkg'], fdata['archnum'], toc_dir).getbuffer().tobytes())

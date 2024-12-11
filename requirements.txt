@@ -1,0 +1,6 @@
+pandas==2.0.3
+Pillow==10.4.0
+pyqt6==6.4.2
+PyQt6_sip==13.8.0
+simpleaudio==1.0.4
+pyqt6-qt6==6.4.3

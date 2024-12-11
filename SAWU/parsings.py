@@ -1,7 +1,8 @@
 import os, sys, struct, time, io, json
+import pandas as pd
 from .config import *
 def ExportToLog(f):
-    export = open('SAWU.txt', 'w')
+    export = open(txtpath, 'w')
     #read header of TOC
     packs = struct.unpack("<I",f.read(4))[0] #packs count
     resources = struct.unpack("<I",f.read(4))[0] #resources count
@@ -48,9 +49,42 @@ def ExportToLog(f):
             if fnum == 4294967295:
                 if fixcount:
                     fnum = 0
-                    export.write(f'{ftid} {fnum} {archnum} {sizeunp} {sizepkg} {offset} {ftype} {attr1} {attr2} {attr3} {attr4} {attr5} {attr6} -- resource contains one file\n')
+                export.write(f'{ftid} {fnum} {archnum} {sizeunp} {sizepkg} {offset} {ftype} {attr1} {attr2} {attr3} {attr4} {attr5} {attr6} -- resource contains one file\n')
             else:
                 export.write(f'{ftid} {fnum} {archnum} {sizeunp} {sizepkg} {offset} {ftype} {attr1} {attr2} {attr3} {attr4} {attr5} {attr6}\n')
+
+def ExportToCSV(f):
+    csvexport = []
+    #read header of TOC
+    packs = struct.unpack("<I", f.read(4))[0] #packs count
+    resources = struct.unpack("<I", f.read(4))[0] #resources count
+
+    for ii in range(resources):
+        resourceid = struct.unpack("<I", f.read(4))[0] #resource id used in Scripts4.pak
+        filesinr = struct.unpack("<I", f.read(4))[0] #files in resource
+
+        for i in range(filesinr): #file (not resource) block's size is 52
+            ftid = struct.unpack("<I", f.read(4))[0] #file type ID (check toc specs)
+            fnum = struct.unpack("<I", f.read(4))[0] #file num in resource
+            archnum = struct.unpack("<I", f.read(4))[0] #archive num
+            sizeunp = struct.unpack("<I", f.read(4))[0] #size to unpack
+            sizepkg = struct.unpack("<I", f.read(4))[0] #size packed
+            offset = struct.unpack("<I", f.read(4))[0] #offset
+            ftype = struct.unpack("<I", f.read(4))[0] #idk 0-2
+            attr1 = struct.unpack("<I", f.read(4))[0] #for dds: width, for wav: channels
+            attr2 = struct.unpack("<I", f.read(4))[0] #for dds: height, for wav: frequency
+            attr3 = struct.unpack("<I", f.read(4))[0] #for dds: real width(?), for wav: bits
+            attr4 = struct.unpack("<I", f.read(4))[0] #for dds: real height(?), for wav: ?
+            attr5 = struct.unpack("<I", f.read(4))[0] #0 on all other, 1 on dds
+            attr6 = struct.unpack("<I", f.read(4))[0] #for dds: nothing, for wav: ?
+
+            if fnum == 4294967295 and fixcount:
+                fnum = 0
+            csvexport.append([resourceid, filesinr, ftid, fnum, archnum, sizeunp, sizepkg, offset, ftype, attr1, attr2, attr3, attr4, attr5, attr6])
+
+    df = pd.DataFrame(csvexport, columns=['RESID', 'FILESINRES', 'FTID', 'FNUM', 'ARCHNUM', 'SIZEUNP', 'SIZEPKG', 'OFFSET', 'FTYPE', 'WDTH/CHS', 'HGHT/FRQ', 'WDTH/BIT', 'HGHT/FRSTP', 'ONE/ZRO', 'UNK/SECP'])
+    df.to_csv(csvpath, index=False)
+
 
 def ExportToJson(f):
     #creates json file with size about 300MB!!!
@@ -176,8 +210,8 @@ def read_partially(f, resource_id):
         number = struct.unpack_from('<I', toc_content, i)[0]
         if number == resource_id:
             f.seek(i)
-            resourceid = struct.unpack("<I", f.read(4))[0]  # resource id used in Scripts4.pak
-            filesinr = struct.unpack("<I", f.read(4))[0]  # files in resource
+            resourceid = struct.unpack("<I", f.read(4))[0] #resource id used in Scripts4.pak
+            filesinr = struct.unpack("<I", f.read(4))[0] #files in resource
             resource_data = {
                 "resource_id": resourceid,
                 "filescnt": filesinr,
@@ -204,7 +238,10 @@ def read_partially(f, resource_id):
                     "fnum": fnum,
                     "archnum": archnum,
                     "sizepkg": sizepkg,
+                    "sizeunp": sizeunp,
                     "offset": offset,
+                    "attr1": attr1,
+                    "attr2": attr2
                 }
                 resource_data["files"].append(file_data)
             return json.dumps(resource_data)
