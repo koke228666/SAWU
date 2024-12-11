@@ -39,6 +39,8 @@ def makepak(folder_path: str, archive) -> List[Tuple[str, int, int]]:
                 file_size = os.path.getsize(file_path)
                 with open(file_path, 'rb') as file:
                     file_data = file.read()
+                    if file_data[:4] == b'\x52\x49\x46\x46':
+                        file_data = b'\x28\x00\x00\x00' + file_data[4:] #remove riff header
                     f.write(file_data)
                 file_info.append((name_without_ext, file_size, current_offset))
                 current_offset += file_size

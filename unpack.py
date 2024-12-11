@@ -96,10 +96,16 @@ while True:
         length = resource_data['files'][filenum]['sizepkg']
         paknum = resource_data['files'][filenum]['archnum']
         intfid = resource_data['files'][filenum]['fnum']
+        if filetype == 1:
+            ftype = 'dds'
+        elif filetype == 3:
+            ftype = 'wav'
+        else:
+            ftype = 'bin'
         try:
             #preview_file(file)
-            save_file(file, f'{resid}//res//{intfid}.dds', os.path.dirname(tocpath), True)
+            save_file(file, f'{resid}//res//{intfid}.{ftype}', os.path.dirname(tocpath), True)
         except:
-            save_file(file, f'{resid}//res//{intfid}.dds', os.path.dirname(tocpath), False)
+            save_file(file, f'{resid}//res//{intfid}.{ftype}', os.path.dirname(tocpath), False)
         filenum += 1
     export_dot_res(f, resid, os.path.join(str(resid), 'resource.bin'))
