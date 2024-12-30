@@ -1,5 +1,8 @@
+# !!! АХТУНГ !!!
+### Версия с возможностью перепаковки лежит >> [тут](https://github.com/koke228666/SAWU/tree/repacker-test) <<
+
 # Some info about Smeshariki AW game archives
-This is just a data stream, that contains WAV, DDS and other files. Textures are compressed, no encrypting. WAV files don't have RIFF header.
+This is just a data stream, that contains WAV, DDS and other files. Textures are compressed, WAV files don't have RIFF header.
 
 Now, its rewritten and supports more files (new features coming soon)
 
